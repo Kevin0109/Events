@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文章列表</title>
+    <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/jquery-1.12.4.min.js"></script>
+    <script src="./js/tool.js"></script>
+    <script src="./js/user.js"></script>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="common_title">
+            用户信息修改
+        </div>
+        <div class="container-fluid common_con">
+            <form class="form-horizontal article_form">
+                <div class="form-group">
+                    <label for="username" class="col-sm-2 control-label">用户名称：</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="username" value="李思思" name="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nickname" class="col-sm-2 control-label">昵称：</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="nickname" value="思思" name="nickname">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="col-sm-2 control-label">邮箱：</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="email" value="lisisi@126.com" name="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="user_pic" class="col-sm-2 control-label">用户图标：</label>
+                    <div class="col-sm-10">
+                        <img src="images/2.jpg" alt="" class="user_pic " id='avatar'>
+                        <input type="file" id="user_pic" name="user_pic">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="col-sm-2 control-label">密码：</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="password" value="12345678" name="password">
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <!-- <button type="submit" class="btn btn-success">修改</button> -->
+                        <button type="button" class="btn btn-success" id='btn'>修改</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // 点击个人中心,获取信息显示在页面中, 添加编辑功能
+
+        /* 将用户详细信息展示在页面中
+           1. 首先请求用户详细信息   (手动添加id,为方便操作,将id名与返回数据中的属性名相同)
+           2. 展示在页面中
+        */
+        user.getUser({
+            success: function (res) {
+                $.each(res.data, function (k, ele) {
+                    if (k === 'user_pic') {
+                        $('#avater').prop('src', ele);
+                        return;
+                    }
+                    $('#' + k).val(ele);
+                })
+            }
+        });
+
+
+        // 编辑用户信息
+        // 1.添加点击事件
+        $('#btn').on('click', function () {
+            // 1.1 判断是否信息填写完整
+            if (
+                $('#username').val().trim() === '' ||
+                $('#nickname').val().trim() === '' ||
+                $('#email').val().trim() === '' ||
+                $('#password').val().trim() === '' ||
+                // 要想知道文件域是否为空,需要获取files属性,但是files是DOM元素中的属性, 需要在获取到的文件域元素后加[0]
+                $('#user_pic')[0].files.length === 0
+            ) {
+                alert('请填写完整信息');
+                return
+            }
+            // 2.1 将信息发送给浏览器进行处理, 使用FormData
+            // 注意 FormData方法中, 传入的参数必须是DOM对象形式的form标签 即加[0]
+            var fd = new FormData($('form')[0]);
+            // 2.2 如果检测合格,则用jQuery发送ajax请求
+            // 注意点1: 使用FormData发送ajax,必须有name ,且name必须通过接口文档确定
+
+            user.editInfo({
+                data: { fd: fd },
+                success: function (res) {
+                    // 2.3 经过检测code值  如果成功,跳转页面
+                    // location.href是window属性,但是我们需要从index.html跳转到login.html, 所以使window.parent.location.href
+                    parent.location.href = './login.html';
+                }
+            });
+        })
+
+        // 选择头像文件,添加图片预览功能
+        $('#user_pic').on('change', function () {
+            // DOM新方法: URL.createObjectURL  获取图片的临时地址
+            // $(this)[0].files[0]      注意: 将某个文件的信息,而不是整个文件
+            var tempSrc = URL.createObjectURL($(this)[0].files[0]);
+            // 给input中的图片变更临时地址即可
+            $('#avatar').prop('src', tempSrc);
+        })
+    </script>
+</body>
+
+</html>
