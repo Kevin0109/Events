@@ -25,35 +25,30 @@
         <div class="container-fluid common_con">
             <form class="form-horizontal article_form">
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
+                    <label for="name" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" placeholder="文章标题">
+                        <input type="text" class="form-control" id="title" name='title' placeholder="文章标题">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
+                    <label for="cover" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" id="cover" name="cover">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
+                    <label for="type" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
+                        <select class="form-control" id="sel" name="type">
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">发布时间：</label>
+                    <label for="date" class="col-sm-2 control-label">发布时间：</label>
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="dateinput">
+                            <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="dateinput" name="date">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
@@ -65,14 +60,14 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" id="rich_content" name="content" placeholder="文章内容">
+                        <textarea class="form-control" id="rich_content" placeholder="文章内容">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda fugiat illo nihil molestias ab. Laborum eius non atque, totam sapiente quae obcaecati assumenda ratione inventore pariatur maiores, qui libero delectus.
                             </textarea>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">发布</button>
+                        <button type="button" class="btn btn-success" id="publish">发布</button>
                         <button type="submit" class="btn btn-default">存为草稿</button>
                     </div>
                 </div>
@@ -81,5 +76,65 @@
     </div>
 
 </body>
+<!-- 引入js文件,以便调用方法 -->
+<script src="./js/article.js"></script>
+<script src="./js/tool.js"></script>
+
+<!-- 引入模板引擎js文件 -->
+<script src="./js/template-web.js"></script>
+<!-- 创建模板引擎结构 -->
+<script type="text/template" id="temp">
+     {{each data val}}
+     <option value = '{{val.id}}' >{{val.name}}</option>
+     {{/each}}
+</script>
+
+<script>
+    // 1. 文章中的下拉菜单,需要获取数据并进行结构创建 
+    //    --可以调用原来的getCate方法 (注意先引入js文件)
+    article.getCate({
+        success: function (res) {
+            // 通过模板引擎将结构添加到页面
+            $('#sel').html(template('temp', res));
+        }
+    });
+    // 2. 添加点击事件,点击发布
+    $('#publish').on('click', function () {
+        // 2.1 首先进行判断,是否都编辑了数据
+        if (
+            $('#title').val().trim() === '' ||
+            $('#cover').val().trim() === '' ||
+            $('#dateinput').val().trim() === '' ||
+            $('#sel').val().trim() === ''
+        ) {
+            alert('请填写完整信息');
+            return
+        }
+        // 2.2 使用FormData 进行表单处理(这里只能处理有name属性的)
+        var fd = new FormData($('form')[0]);
+        // 2.3 将富文本编辑器中的内容取出,并添加进FormData中,并设置state为已发布
+        fd.append('content', tinymce.activeEditor.getContent());
+        fd.append('state', '已发布');
+
+        // 3. 发送请求,进行新增操作
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:8000/admin/article_publish',
+            data: fd,
+            // 注意:使用FormData发送数据,一定要添加以下两个属性
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                // 3.1 检测是否成功,如果成功跳转到列表页展示
+                if (res.code === 201) {
+                    location.href = './article_list.html';
+                } else {
+                    alert('网络开小差啦!!!')
+                }
+            }
+        })
+    })
+
+</script>
 
 </html>
