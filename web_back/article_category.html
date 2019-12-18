@@ -74,6 +74,7 @@
     </div>
 
     <script src="./js/article.js"></script>
+    <script src="./js/tool.js"></script>
 
     <!-- 引入模板引擎的js文件 -->
     <script src="js/template-web.js"></script>
@@ -146,6 +147,9 @@
             }
             // 2.3 如果验证成功,则发送请求,添加进结构
             article.addCate({
+                data: {
+                    info: $('form').serialize()
+                },
                 success: function () {
                     location.reload();
                 },
@@ -198,7 +202,10 @@
                 };
 
                 article.editCate({
-                    success: function (res) {
+                    data: {
+                        info: $('form').serialize()
+                    },
+                    success: function () {
                         location.reload();
                     },
                     false: function () {
@@ -212,22 +219,19 @@
         // 分类数据删除功能
         // 4.1 添加点击事件 (同样需要事件委托)
         $('#tbody').on('click', '.del', function () {
+            console.log(111);
+
             // 4.2 获取点击的这条的id
             var id = $(this).data('id');
             // 4.3 发送ajax请求
-            $.ajax({
-                type: 'POST',
-                url: 'http://localhost:8000/admin/category_delete',
+            article.delCate({
                 data: {
                     id: id
                 },
-                success: function (res) {
-                    if (res.code === 200) {
-                        // console.log(res);
-                        location.reload();
-                    }
+                success: function () {
+                    location.reload();
                 }
-            })
+            });
         })
 
     </script>

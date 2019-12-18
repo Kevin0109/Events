@@ -3,7 +3,7 @@
 var article = {
     getCate: function (options) {
         $.ajax({
-            url: 'http://localhost:8000/admin/category_search',
+            url: GETCATE,
             success: function (res) {
                 if (res.code === 200) {
                     options.success(res);
@@ -17,8 +17,8 @@ var article = {
             // 2.4 如果验证成功,则发送请求,添加进结构
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:8000/admin/category_add',
-                data: $('form').serialize(),       //  serialize方法 是将表单中内容变成名=值&名=值...的格式
+                url: ADDCATE,
+                data: options.data.info,      //  serialize方法 是将表单中内容变成名=值&名=值...的格式
                 success: function (res) {
                     if (res.code === 200) {
                         options.success();
@@ -38,13 +38,25 @@ var article = {
     editCate: function (options) {
         $.ajax({
             type: 'POST',
-            url: 'http://localhost:8000/admin/category_edit',
-            data: $('form').serialize(),
+            url: EDITCATE,
+            data: options.data.info,
             success: function (res) {
                 if (res.code === 200) {
-                    options.success(res);
+                    options.success();
                 } else {
-                    options.false(res);
+                    options.false();
+                }
+            }
+        })
+    },
+    delCate: function (options) {
+        $.ajax({
+            type: 'POST',
+            url: DELCATE,
+            data: options.data.id,
+            success: function (res) {
+                if (res.code === 200) {
+                    options.success();
                 }
             }
         })
