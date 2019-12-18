@@ -38,13 +38,8 @@
                     <li><a href="#">公 司</a></li>
                 </ul>
             </div>
-            <ul class="left_menu fl">
-                <li><a href="#">最 新</a></li>
-                <li><a href="#">科 技</a></li>
-                <li><a href="#">股 市</a></li>
-                <li><a href="#">商 品</a></li>
-                <li><a href="#">外 汇</a></li>
-                <li><a href="#">公 司</a></li>
+            <ul class="left_menu fl" id="nav">
+
             </ul>
             <ul class="right_menu fr">
                 <li><a href="#">科技专题</a></li>
@@ -56,26 +51,7 @@
     <div class="main_con clearfix">
         <div class="left_con">
             <ul class="focus_list">
-                <li class="first">
-                    <a href="#"><img src="images/pic01.jpg" alt=""></a>
-                    <p>图片说明</p>
-                </li>
-                <li>
-                    <a href="#"><img src="images/pic02.jpg" alt=""></a>
-                    <p>图片说明图片说明图片说明图片说明图片说明图片说明图片说明图片说明图片说明</p>
-                </li>
-                <li>
-                    <a href="#"><img src="images/pic03.jpg" alt=""></a>
-                    <p>图片说明</p>
-                </li>
-                <li>
-                    <a href="#"><img src="images/pic05.jpg" alt=""></a>
-                    <p>图片说明</p>
-                </li>
-                <li>
-                    <a href="#"><img src="images/pic06.jpg" alt=""></a>
-                    <p>图片说明</p>
-                </li>
+
             </ul>
 
             <div class="common_title">
@@ -215,12 +191,72 @@
             <span>|</span>
             <a href="#">招聘人才</a>
             <span>|</span>
-            <a href="#">友情链接</a>		
+            <a href="#">友情链接</a>
         </div>
-        <p>CopyRight © 2019 深圳大事件信息技术股份有限公司   All Rights Reserved</p>
-        <p>电话：0755-****888    粤ICP备*******8号</p>
+        <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
+        <p>电话：0755-****888 粤ICP备*******8号</p>
     </div>
 
 </body>
+<script src="./js/axios.js"></script>
+<script src="./js/jquery-1.12.4.min.js"></script>
+
+<!-- 引入模板引擎js文件 -->
+<script src="../web_back/js/template-web.js"></script>
+
+<!-- 通过模板引擎,创建文章信息结构 -->
+<script type="text/template" id="art">
+{{each data val i}}
+    <li {{if i===0 }}class="first" {{/if}}>
+        <a href="#"><img src={{val.cover}} alt=""></a>
+        <p>{{val.title}}</p>
+    </li>
+{{/each}}
+</script>
+
+<script type="text/template" id="category">
+    {{each data val}}
+    <li><a href="./list.html?id={{val.id}}">{{val.name}}</a></li>
+    {{/each}}
+</script>
+
+
+
+<script>
+    // 通过axios请求数据,通过jQuery进行结构操作
+    // 1. 首页顶部文章信息展示
+    // ---请求文章数据,用perpage参数设置文章个数,此处为5个
+    axios.get('http://localhost:8000/admin/search', {
+        params: {
+            perpage: 5
+        }
+    }).then(function (res) {
+        var res = res.data;
+        if (res.code === 200) {
+            // 使用模板引擎,将文章信息添加进页面中
+            var str = template('art', res)
+            $('.focus_list').html(str);
+        }
+    })
+
+    // 2. 设置顶部分类导航展示
+    //    2.1 发送请求,获取分类导航信息
+    axios({
+        method: 'GET',
+        url: 'http://localhost:8000/admin/category_search'
+    }).then(function (res) {
+        var res = res.data;
+        if (res.code === 200) {
+            // 检测成功后利用模板引擎添加创建的结构
+            var atr = template('category', res);
+            $('#nav').html(atr);
+            // 注意: 由于跳转页面后,我们需要知道用户通过点击哪个类别,以便我们显示哪个类别的内容
+            // ------所以,我们通过在网址后加 ?id={{val.id}} 的方法,之后在list.html中再通过id值获得类别
+        }
+    })
+
+
+
+</script>
 
 </html>
