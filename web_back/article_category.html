@@ -82,14 +82,13 @@
     <!-- 设置分类表格的模板结构 -->
     <script type="text/template" id="category">
 
-        // 
         {{each data val}}
         <tr>
             <td>{{val.name}}</td>
             <td>{{val.slug}}</td>
             <td class="text-center">
-                <a href="javascript:;" data-id='{{val.id}}' class="btn btn-info btn-xs edit" >编辑</a>
-                <a href="javascript:;" data-id='{{val.id}}' class="btn btn-danger btn-xs del">删除</a>
+                <a href="javascript:;" data-id="{{val.id}}" class="btn btn-info btn-xs edit" >编辑</a>
+                <a href="javascript:;" data-id="{{val.id}}" class="btn btn-danger btn-xs del">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -219,11 +218,10 @@
         // 分类数据删除功能
         // 4.1 添加点击事件 (同样需要事件委托)
         $('#tbody').on('click', '.del', function () {
-            console.log(111);
-
             // 4.2 获取点击的这条的id
             var id = $(this).data('id');
             // 4.3 发送ajax请求
+
             article.delCate({
                 data: {
                     id: id

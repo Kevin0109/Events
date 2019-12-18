@@ -53,7 +53,7 @@ var article = {
         $.ajax({
             type: 'POST',
             url: DELCATE,
-            data: options.data.id,
+            data: { id: options.data.id, },
             success: function (res) {
                 if (res.code === 200) {
                     options.success();
