@@ -76,13 +76,15 @@
         */
         user.getUser({
             success: function (res) {
-                $.each(res.data, function (k, ele) {
-                    if (k === 'user_pic') {
-                        $('#avater').prop('src', ele);
-                        return;
-                    }
-                    $('#' + k).val(ele);
-                })
+                console.log(res);
+
+                // $.each(res.data, function (k, ele) {
+                //     if (k === 'user_pic') {
+                //         $('#avater').prop('src', ele);
+                //         return;
+                //     }
+                //     $('#' + k).val(ele);
+                // })
             }
         });
 

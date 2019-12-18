@@ -86,8 +86,8 @@
             <td class="text-center">{{val.date}}</td>
             <td class="text-center">{{val.state}}</td>
             <td class="text-center">
-                <a href="post-edit.html?id=995" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:deleteTr( 995 );" class="btn btn-danger btn-xs">删除</a>
+                <a href="#" data-id='{{val.id}}'class="btn btn-default btn-xs" edit>编辑</a>
+                <a href="javascript:;" data-id='{{val.id}}' class="btn btn-danger btn-xs del">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -171,6 +171,23 @@
                 }
             })
         }
+        // 删除文章功能
+
+        $('tbody').on('click', '.del', function () {
+            var id = $(this).data('id');
+            $.ajax({
+
+                url: 'http://localhost:8000/admin/article_delete',
+                data: {
+                    id: id
+                },
+                success: function (res) {
+                    if (res.code === 200) {
+                        location.reload();
+                    }
+                }
+            })
+        })
 
     </script>
 
